@@ -40,10 +40,10 @@ def calcOffsets():
         for o in orientations:
             s1r: List[Vector3] = [o.dot(b1) for b1 in s1] # type: ignore
             for b1 in s1r:
-                deltas1 = [subtract(b, b1) for b in s1r]
+                deltas1 = set(tuple(subtract(b, b1)) for b in s1r)
                 for b0 in s0:
-                    deltas0 = [subtract(b, b0) for b in s0]
-                    l = len(set(tuple(x) for x in deltas0).intersection(tuple(x) for x in deltas1))
+                    deltas = deltas1.intersection(tuple(subtract(b, b0)) for b in s0)
+                    l = len(deltas)
                     if l >= 12:
                         d = subtract(b0, b1)
                         d.resize((4,))
