@@ -28,7 +28,7 @@ def check(ivalues: List[int])->bool:
             if icount < len(ivalues):
                 state[s1] = ivalues[icount]
             else:
-                state[s1] = (op, icount, None, 1, 9)
+                state[s1] = (1, 9)
             icount += 1
         else:
             t2 = tokens[2]
@@ -42,23 +42,17 @@ def check(ivalues: List[int])->bool:
                 continue
             if op == 'div' and v2 == 1:
                 continue
-            if op == 'div' and v1 == v2:
-                state[s1] = 1
-                continue
-            if op == 'mod' and v1 == v2:
-                state[s1] = 0
-                continue
 
             opf = ops[op]
             if type(v1) == int and type(v2) == int:
                 state[s1] = opf(v1, v2)
                 continue
-            min1 = v1 if type(v1) == int else v1[3]
-            min2 = v2 if type(v2) == int else v2[3]
-            max1 = v1 if type(v1) == int else v1[4]
-            max2 = v2 if type(v2) == int else v2[4]
+            min1 = v1 if type(v1) == int else v1[0]
+            min2 = v2 if type(v2) == int else v2[0]
+            max1 = v1 if type(v1) == int else v1[1]
+            max2 = v2 if type(v2) == int else v2[1]
             if op == 'mod':
-                state[s1] = (op, v1, v2, (min2+1) if min2 < 0 else 0, (max2-1) if max2 > 0 else 0)
+                state[s1] = ((min2+1) if min2 < 0 else 0, (max2-1) if max2 > 0 else 0)
                 continue
             if op == 'eql':
                 if min2 > max1 or min1 > max2:
@@ -66,7 +60,7 @@ def check(ivalues: List[int])->bool:
                 elif v1 == v2:
                     state[s1] = 1
                 else:
-                    state[s1] = (op, v1, v2, 0, 1)
+                    state[s1] = (0, 1)
                 continue
             perms = [opf(a, b) for (a, b) in [(min1, min2), (min1, max2), (max1, min2), (max1, max2)]]
             minn = min(perms)
@@ -74,11 +68,11 @@ def check(ivalues: List[int])->bool:
             if minn == maxn:
                 state[s1] = minn
             else:
-                state[s1] = (op, v1, v2, minn, maxn)
+                state[s1] = (minn, maxn)
     valid = state[3]
     if type(valid) == int:
         return valid == 0
-    return 0 in range(state[3][3], state[3][4]+1)
+    return 0 in range(valid[0], valid[1]+1)
 
 def calc(start: int, stop: int, step: int):
     ivalues: List[int] = []
